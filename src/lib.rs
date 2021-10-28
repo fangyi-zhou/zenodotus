@@ -24,7 +24,7 @@ impl fmt::Display for BibEntry {
 impl From<&Bibliography> for BibEntry {
     fn from(b: &Bibliography) -> Self {
         BibEntry {
-            entry_type: b.entry_type().to_string(),
+            entry_type: b.entry_type().to_string().to_lowercase(),
             citation_key: b.citation_key().to_string(),
             tags: b
                 .tags()
