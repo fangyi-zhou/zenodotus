@@ -5,11 +5,39 @@ use nom_bibtex::*;
 use std::collections::HashMap;
 use std::fmt;
 use std::fs;
+use std::io;
 
 pub struct BibEntry {
     entry_type: String,
     citation_key: String,
     tags: HashMap<String, String>,
+}
+
+fn is_stylish_citation_key(key: &String, entry_type: &str) -> bool {
+    match entry_type {
+        "article" | "conference" | "inproceedings" => true,
+        "book" => true,
+        _ => true,
+    }
+}
+
+fn prompt_new_citation_key(b: &mut BibEntry) -> io::Result<String> {
+    println!("{}", b);
+    println!("Please entry a new citation key for the following bib entry:");
+    let mut key = String::new();
+    let stdin = io::stdin();
+    stdin.read_line(&mut key)?;
+    Ok(key)
+}
+
+impl BibEntry {
+    fn stylise(&mut self) {
+        while !is_stylish_citation_key(&self.citation_key, &self.entry_type) {
+            if let Ok(new_key) = prompt_new_citation_key(self) {
+                self.citation_key = new_key
+            }
+        }
+    }
 }
 
 impl fmt::Display for BibEntry {
@@ -42,6 +70,10 @@ pub fn load_file(filename: &str) -> Result<Vec<BibEntry>, BibtexError> {
     Ok(bibtex
         .bibliographies()
         .iter()
-        .map(|b| BibEntry::from(b))
+        .map(|b| {
+            let mut entry = BibEntry::from(b);
+            entry.stylise();
+            entry
+        })
         .collect())
 }
