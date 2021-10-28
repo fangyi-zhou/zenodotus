@@ -14,6 +14,7 @@ fn main() -> Result<()> {
             for entry in &entries {
                 writeln!(file, "{}", entry)?;
             }
+            println!("Written re-formatted bib to output.bib");
         }
     };
     Ok(())
