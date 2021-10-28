@@ -1,0 +1,4 @@
+[submodule "vendor/nom-bibtex"]
+	path = vendor/nom-bibtex
+	url = git@github.com:fangyi-zhou/nom-bibtex
+	branch = month-abbreviations
