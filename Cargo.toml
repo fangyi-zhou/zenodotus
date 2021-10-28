@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 nom-bibtex = { path = "vendor/nom-bibtex" }
+regex = "1"
+lazy_static = "1.4"

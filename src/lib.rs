@@ -1,7 +1,9 @@
 extern crate nom_bibtex;
 
+use lazy_static::lazy_static;
 use nom_bibtex::error::BibtexError;
 use nom_bibtex::*;
+use regex::Regex;
 use std::collections::HashMap;
 use std::fmt;
 use std::fs;
@@ -13,11 +15,17 @@ pub struct BibEntry {
     tags: HashMap<String, String>,
 }
 
-fn is_stylish_citation_key(key: &String, entry_type: &str) -> bool {
+fn is_stylish_citation_key(key: &str, entry_type: &str) -> bool {
+    lazy_static! {
+        // CONFNAME + 2 digit year + Some words
+        static ref CONFERENCE_CITATION_KEY_REGEX: Regex =
+            Regex::new("[[:alpha:]]+[[:digit:]]{2}[[:alnum:]]+").unwrap();
+        // Any Combination of words
+        static ref OTHER_CITATION_KEY_REGEX: Regex = Regex::new("[[:alnum:]]+").unwrap();
+    }
     match entry_type {
-        "article" | "conference" | "inproceedings" => true,
-        "book" => true,
-        _ => true,
+        "article" | "conference" | "inproceedings" => CONFERENCE_CITATION_KEY_REGEX.is_match(key),
+        _ => OTHER_CITATION_KEY_REGEX.is_match(key),
     }
 }
 
