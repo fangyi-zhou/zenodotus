@@ -2,13 +2,14 @@ extern crate nom_bibtex;
 
 use nom_bibtex::error::BibtexError;
 use nom_bibtex::*;
+use std::collections::HashMap;
 use std::fmt;
 use std::fs;
 
 pub struct BibEntry {
     entry_type: String,
     citation_key: String,
-    tags: Vec<(String, String)>,
+    tags: HashMap<String, String>,
 }
 
 impl fmt::Display for BibEntry {
