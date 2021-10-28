@@ -26,7 +26,11 @@ impl From<&Bibliography> for BibEntry {
         BibEntry {
             entry_type: b.entry_type().to_string(),
             citation_key: b.citation_key().to_string(),
-            tags: b.tags().to_vec(),
+            tags: b
+                .tags()
+                .iter()
+                .map(|(k, v)| (k.to_lowercase(), v.clone()))
+                .collect(),
         }
     }
 }
