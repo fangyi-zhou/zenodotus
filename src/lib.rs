@@ -6,9 +6,9 @@ use std::fmt;
 use std::fs;
 
 pub struct BibEntry {
-    pub entry_type: String,
-    pub citation_key: String,
-    pub tags: Vec<(String, String)>,
+    entry_type: String,
+    citation_key: String,
+    tags: Vec<(String, String)>,
 }
 
 impl fmt::Display for BibEntry {
