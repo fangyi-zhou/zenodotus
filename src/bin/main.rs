@@ -11,7 +11,8 @@ fn main() -> Result<()> {
         Ok(entries) => {
             println!("Parsed successfully! Found {} entries", entries.len());
             let mut file = File::create("output.bib")?;
-            for entry in &entries {
+            for mut entry in entries {
+                entry.stylise();
                 writeln!(file, "{}", entry)?;
             }
             println!("Written re-formatted bib to output.bib");

@@ -39,7 +39,7 @@ fn prompt_new_citation_key(b: &mut BibEntry) -> io::Result<String> {
 }
 
 impl BibEntry {
-    fn stylise(&mut self) {
+    pub fn stylise(&mut self) {
         while !is_stylish_citation_key(&self.citation_key, &self.entry_type) {
             if let Ok(new_key) = prompt_new_citation_key(self) {
                 self.citation_key = new_key
@@ -75,13 +75,5 @@ impl From<&Bibliography> for BibEntry {
 pub fn load_file(filename: &str) -> Result<Vec<BibEntry>, BibtexError> {
     let input = fs::read_to_string(filename).unwrap();
     let bibtex = Bibtex::parse(&input)?;
-    Ok(bibtex
-        .bibliographies()
-        .iter()
-        .map(|b| {
-            let mut entry = BibEntry::from(b);
-            entry.stylise();
-            entry
-        })
-        .collect())
+    Ok(bibtex.bibliographies().iter().map(BibEntry::from).collect())
 }
