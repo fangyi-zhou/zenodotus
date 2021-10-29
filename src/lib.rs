@@ -47,8 +47,23 @@ fn prompt_change_title(old_title: &str, new_title: &str) -> io::Result<bool> {
 }
 
 fn fix_title(title: &str) -> Option<String> {
+    // The title is surrounded in curly braces
+    let title = title.trim();
     if title.starts_with("{") && title.ends_with("}") {
         return None;
+    }
+    // First character is captialised, the rest is in lower cases.
+    let mut chars = title.chars();
+    // Assuming title is not empty
+    let is_fst_upper = chars.next().unwrap().is_uppercase();
+    let is_rest_nonupper = chars.all(|c| !c.is_uppercase());
+    if is_rest_nonupper {
+        if is_fst_upper {
+            return None;
+        } else {
+            let mut chars = title.chars();
+            return Some(chars.next().unwrap().to_uppercase().chain(chars).collect());
+        }
     }
     panic!("TODO")
 }
