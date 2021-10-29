@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use nom_bibtex::error::BibtexError;
 use nom_bibtex::*;
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fmt;
 use std::fs;
 use std::io;
@@ -12,7 +12,7 @@ use std::io;
 pub struct BibEntry {
     entry_type: String,
     citation_key: String,
-    tags: HashMap<String, String>,
+    tags: BTreeMap<String, String>,
 }
 
 fn is_stylish_citation_key(key: &str, entry_type: &str) -> bool {
