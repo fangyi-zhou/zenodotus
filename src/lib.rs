@@ -42,7 +42,9 @@ impl BibEntry {
     pub fn stylise(&mut self) {
         while !is_stylish_citation_key(&self.citation_key, &self.entry_type) {
             if let Ok(new_key) = prompt_new_citation_key(self) {
-                self.citation_key = new_key
+                if !new_key.is_empty() {
+                    self.citation_key = new_key
+                }
             }
         }
     }
