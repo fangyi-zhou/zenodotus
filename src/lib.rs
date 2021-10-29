@@ -35,7 +35,7 @@ fn prompt_new_citation_key(b: &mut BibEntry) -> io::Result<String> {
     let mut key = String::new();
     let stdin = io::stdin();
     stdin.read_line(&mut key)?;
-    Ok(key)
+    Ok(key.trim().to_owned())
 }
 
 fn prompt_change_title(old_title: &str, new_title: &str) -> io::Result<bool> {
