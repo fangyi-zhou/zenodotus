@@ -49,7 +49,7 @@ fn prompt_change_title(old_title: &str, new_title: &str) -> io::Result<bool> {
 fn fix_title(title: &str) -> Option<String> {
     // The title is surrounded in curly braces
     let title = title.trim();
-    if title.starts_with("{") && title.ends_with("}") {
+    if title.starts_with('{') && title.ends_with('}') {
         return None;
     }
     // First character is captialised, the rest is in lower cases.
@@ -65,7 +65,54 @@ fn fix_title(title: &str) -> Option<String> {
             return Some(chars.next().unwrap().to_uppercase().chain(chars).collect());
         }
     }
-    panic!("TODO")
+    let mut words = vec![];
+    let mut current_word = String::new();
+    let mut current_word_has_upper = false;
+    let mut is_first_char_lbrace = false;
+    let mut iter = title.chars().peekable();
+    while iter.peek().is_some() {
+        let c = iter.next().unwrap();
+        match c {
+            ' ' => {
+                if current_word.is_empty() {
+                    continue;
+                } else {
+                    let is_last_char_rbrace = current_word.ends_with('}');
+                    if current_word_has_upper && !(is_first_char_lbrace && is_last_char_rbrace) {
+                        // Wrap the entire word with curly braces
+                        current_word.insert(0, '{');
+                        current_word.push('}');
+                    }
+                    words.push(current_word.to_owned());
+                    current_word = String::new();
+                    current_word_has_upper = false;
+                    is_first_char_lbrace = false;
+                }
+            }
+            '{' => {
+                if current_word.is_empty() {
+                    is_first_char_lbrace = true
+                }
+                current_word.push(c)
+            }
+            _ => {
+                if c.is_uppercase() {
+                    current_word_has_upper = true
+                }
+                current_word.push(c)
+            }
+        }
+    }
+    if !current_word.is_empty() {
+        let is_last_char_rbrace = current_word.ends_with('}');
+        if current_word_has_upper && !(is_first_char_lbrace && is_last_char_rbrace) {
+            // Wrap the entire word with curly braces
+            current_word.insert(0, '{');
+            current_word.push('}');
+        }
+        words.push(current_word.to_owned());
+    }
+    Some(words.as_slice().join(" "))
 }
 
 impl BibEntry {
@@ -129,13 +176,16 @@ mod tests {
         assert_eq!(fix_title("{FooBar}"), None);
         assert_eq!(
             fix_title("Foobar FooBar"),
-            Some(String::from("Foobar {FooBar}"))
+            Some(String::from("{Foobar} {FooBar}"))
         );
         assert_eq!(
             fix_title("FooBar FooBar"),
             Some(String::from("{FooBar} {FooBar}"))
         );
-        assert_eq!(fix_title("Foobar {FooBar}"), None);
+        assert_eq!(
+            fix_title("Foobar {FooBar}"),
+            Some(String::from("{Foobar} {FooBar}"))
+        );
         assert_eq!(fix_title("{FooBar FooBar}"), None);
     }
 }
