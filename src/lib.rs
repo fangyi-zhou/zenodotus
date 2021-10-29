@@ -186,6 +186,10 @@ mod tests {
             fix_title("Foobar {FooBar}"),
             Some(String::from("{Foobar} {FooBar}"))
         );
+        assert_eq!(
+            fix_title("{Foobar} F {FooBar}"),
+            Some(String::from("{Foobar} {F} {FooBar}"))
+        );
         assert_eq!(fix_title("{FooBar FooBar}"), None);
     }
 }
