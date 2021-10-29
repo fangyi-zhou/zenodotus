@@ -38,12 +38,34 @@ fn prompt_new_citation_key(b: &mut BibEntry) -> io::Result<String> {
     Ok(key)
 }
 
+fn prompt_change_title(old_title: &str, new_title: &str) -> io::Result<bool> {
+    println!("Change title\n{}\nto\n{}\n? [y/N]", old_title, new_title);
+    let mut resp = String::new();
+    let stdin = io::stdin();
+    stdin.read_line(&mut resp)?;
+    Ok(resp == "y")
+}
+
+fn fix_title(title: &str) -> Option<String> {
+    if title.starts_with("{") && title.ends_with("}") {
+        return None;
+    }
+    panic!("TODO")
+}
+
 impl BibEntry {
     pub fn stylise(&mut self) {
         while !is_stylish_citation_key(&self.citation_key, &self.entry_type) {
             if let Ok(new_key) = prompt_new_citation_key(self) {
                 if !new_key.is_empty() {
                     self.citation_key = new_key
+                }
+            }
+        }
+        if let Some(title) = self.tags.get_mut(&String::from("title")) {
+            if let Some(new_title) = fix_title(title) {
+                if let Ok(true) = prompt_change_title(title, &new_title) {
+                    *title = new_title
                 }
             }
         }
@@ -78,4 +100,27 @@ pub fn load_file(filename: &str) -> Result<Vec<BibEntry>, BibtexError> {
     let input = fs::read_to_string(filename).unwrap();
     let bibtex = Bibtex::parse(&input)?;
     Ok(bibtex.bibliographies().iter().map(BibEntry::from).collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fix_title() {
+        assert_eq!(fix_title("foo"), Some(String::from("Foo")));
+        assert_eq!(fix_title("Foo"), None);
+        assert_eq!(fix_title("FooBar"), Some(String::from("{FooBar}")));
+        assert_eq!(fix_title("{FooBar}"), None);
+        assert_eq!(
+            fix_title("Foobar FooBar"),
+            Some(String::from("Foobar {FooBar}"))
+        );
+        assert_eq!(
+            fix_title("FooBar FooBar"),
+            Some(String::from("{FooBar} {FooBar}"))
+        );
+        assert_eq!(fix_title("Foobar {FooBar}"), None);
+        assert_eq!(fix_title("{FooBar FooBar}"), None);
+    }
 }
