@@ -43,7 +43,7 @@ fn prompt_change_title(old_title: &str, new_title: &str) -> io::Result<bool> {
     let mut resp = String::new();
     let stdin = io::stdin();
     stdin.read_line(&mut resp)?;
-    Ok(resp == "y")
+    Ok(resp.to_lowercase().trim() == "y")
 }
 
 fn fix_title(title: &str) -> Option<String> {
